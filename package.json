@@ -1,19 +1,35 @@
 {
   "name": "@cyberblast/logger",
-  "version": "0.0.1",
-  "description": "A minimalistic logger for node",
+  "version": "0.0.0",
+  "description": "A simple logger for node",
+  "author": "cyberblast <git@cyberblast.org>",
+  "license": "MIT",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node ./test/run.js",
+    "version-patch": "npm version patch -m \"version increment to %s\"",
+    "postversion": "git push && git push --tags",
+    "publish-npm": "npm publish --access public"
   },
   "keywords": [
     "node",
     "log",
     "logger"
   ],
-  "author": "cyberblast <git@cyberblast.org>",
-  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cyberblast/logger.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cyberblast/logger/issues"
+  },
+  "homepage": "https://github.com/cyberblast/logger#readme",
   "engines": {
     "node": "*"
-  }
+  },
+  "dependencies": {
+    "@cyberblast/config": "0.0.2"
+  },
+  "devDependencies": {},
+  "optionalDependencies": {}
 }
