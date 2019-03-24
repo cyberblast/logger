@@ -1,3 +1,22 @@
 {
-  "categories": ["cat1", "cat2"]
+  "categories": ["cat1", "cat2"],
+  "rules": [
+    {
+      "name": "cat1 warnings",
+      "severity": "Warning",
+      "category": "cat1",
+      "filePath": "./test/result/",
+      "console": true
+    }, 
+    {
+      "name": "error",
+      "severity": "Error",
+      "filePath": "./test/result/",
+      "console": true
+    },
+    {
+      "name": "catch all",
+      "filePath": "./test/result/"
+    }
+  ]
 }
