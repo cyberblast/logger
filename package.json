@@ -1,6 +1,6 @@
 {
   "name": "@cyberblast/logger",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A simple logger for node",
   "author": "cyberblast <git@cyberblast.org>",
   "license": "MIT",
