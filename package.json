@@ -4,7 +4,7 @@
   "description": "A simple logger for node",
   "author": "cyberblast <git@cyberblast.org>",
   "license": "MIT",
-  "main": "./src/logger.js",
+  "main": "src/logger.js",
   "scripts": {
     "test": "node ./test/run.js",
     "version-patch": "npm version patch -m \"version increment to %s\"",
