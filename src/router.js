@@ -1,10 +1,12 @@
 const LogFile = require('./logfile');
 const path = require('path');
+const fs = require('fs');
 
 module.exports = class Router{
   constructor(config, event){
     const self = this;
     this.rules = config.rules;
+    this.chatty = config.chatty === true;
     // TODO: handle no rules
     this.logFiles = {};
     event.on('any', data => {
@@ -13,7 +15,7 @@ module.exports = class Router{
     // create LogFile Streams for each rule (with defined path)
     const parseRule = rule => {
       if(rule.filePath !== undefined){
-        // TODO: validate path, create path
+        // TODO: validate path
         // TODO: introduce log retention => add timestamp to logname
         // TODO: handle log retention shift => new file
         rule.logfile = this.filename(rule.name);
@@ -73,7 +75,7 @@ module.exports = class Router{
     for(let logfileName in this.logFiles){
       const logfile = this.logFiles[logfileName];
       if(logfile !== undefined){
-        console.log(`closing logfile ${logfileName}`);
+        if(this.chatty) console.log(`closing logfile ${logfileName}`);
         if(logfile.close) logfile.close();
       }
     }

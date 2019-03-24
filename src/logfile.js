@@ -1,7 +1,11 @@
 const fs = require('fs');
+const path = require('path');
 
 module.exports = function LogFile(filePath){
   this.path = filePath;
+
+  const dir = path.dirname(filePath);
+  fs.mkdirSync(dir, {recursive: true});
 
   const fileStream = fs.createWriteStream(filePath, {
     flags: 'a',

@@ -1,4 +1,5 @@
 {
+  "chatty": true,
   "categories": ["cat1", "cat2"],
   "rules": [
     {
