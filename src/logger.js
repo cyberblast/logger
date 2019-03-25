@@ -1,5 +1,6 @@
 const Event = require('events');
 const config = require('@cyberblast/config');
+const Router = require('./router')
 
 const severityEnum = {
   Error: "Error",
@@ -20,6 +21,7 @@ module.exports = function Logger(onLoadError, onReady, configPath = './logger.js
     NONE: 'NONE'
   };
   const event = new Event();
+  let router;
   
   Object.defineProperty(this, 'category', { 
     get: function() { 
@@ -43,6 +45,7 @@ module.exports = function Logger(onLoadError, onReady, configPath = './logger.js
     onLoadError,
     settings => {
       settings.categories.forEach(self.defineCategory);
+      router = new Router(settings, event);
       onReady(this);
     },
     configPath
@@ -51,10 +54,7 @@ module.exports = function Logger(onLoadError, onReady, configPath = './logger.js
   //#region register custom event handlers
 
   this.onLog = function(callback){
-    event.on(severityEnum.Error, callback);
-    event.on(severityEnum.Warning, callback);
-    event.on(severityEnum.Info, callback);
-    event.on(severityEnum.Verbose, callback);
+    event.on('any', callback);
   }
 
   this.onError = function(callback){
@@ -81,6 +81,8 @@ module.exports = function Logger(onLoadError, onReady, configPath = './logger.js
 
   // level, category, message, data
   this.log = function(logDetails){
+    if(logDetails.time === undefined) logDetails.time = new Date();
+    event.emit('any', logDetails);
     event.emit(logDetails.severity, logDetails);
   }
 
@@ -91,7 +93,8 @@ module.exports = function Logger(onLoadError, onReady, configPath = './logger.js
       severity: severityEnum.Error,
       category,
       message,
-      data
+      data,
+      time: new Date()
     });
   }
 
@@ -109,7 +112,8 @@ module.exports = function Logger(onLoadError, onReady, configPath = './logger.js
       severity: severityEnum.Info,
       category,
       message,
-      data
+      data,
+      time: new Date()
     });
   }
 
@@ -118,9 +122,14 @@ module.exports = function Logger(onLoadError, onReady, configPath = './logger.js
       severity: severityEnum.Verbose,
       category,
       message,
-      data
+      data,
+      time: new Date()
     });
   }
 
   //#endregion
+
+  this.close = function(){
+    router.close();
+  }
 }
