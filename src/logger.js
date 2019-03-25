@@ -81,6 +81,7 @@ module.exports = function Logger(onLoadError, onReady, configPath = './logger.js
 
   // level, category, message, data
   this.log = function(logDetails){
+    if(logDetails.time === undefined) logDetails.time = new Date();
     event.emit('any', logDetails);
     event.emit(logDetails.severity, logDetails);
   }
@@ -92,7 +93,8 @@ module.exports = function Logger(onLoadError, onReady, configPath = './logger.js
       severity: severityEnum.Error,
       category,
       message,
-      data
+      data,
+      time: new Date()
     });
   }
 
@@ -110,7 +112,8 @@ module.exports = function Logger(onLoadError, onReady, configPath = './logger.js
       severity: severityEnum.Info,
       category,
       message,
-      data
+      data,
+      time: new Date()
     });
   }
 
@@ -119,7 +122,8 @@ module.exports = function Logger(onLoadError, onReady, configPath = './logger.js
       severity: severityEnum.Verbose,
       category,
       message,
-      data
+      data,
+      time: new Date()
     });
   }
 
