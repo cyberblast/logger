@@ -15,12 +15,10 @@ const severityLevelEnum = {
   Verbose: 4
 };
 
-module.exports = function Logger(onLoadError, onReady, configPath = './logger.json'){
+module.exports = function Logger(configPath = './logger.json'){
   const self = this;
-  const categories = {
-    NONE: 'NONE'
-  };
-  const event = new Event();
+  let event;
+  let categories;
   let router;
   
   Object.defineProperty(this, 'category', { 
@@ -41,39 +39,20 @@ module.exports = function Logger(onLoadError, onReady, configPath = './logger.js
     } 
   });
 
-  config.load(
-    onLoadError,
-    settings => {
-      settings.categories.forEach(self.defineCategory);
-      router = new Router(settings, event);
-      onReady(this);
-    },
-    configPath
-  );
-
-  //#region register custom event handlers
-
-  this.onLog = function(callback){
-    event.on('any', callback);
+  this.init = async function(){
+    categories = {
+      NONE: "NONE"
+    };
+    const settings = await config.load(configPath);
+    settings.categories.forEach(self.defineCategory);
+    event = new Event();
+    router = new Router(settings, event);
   }
-
-  this.onError = function(callback){
-    event.on(severityEnum.Error, callback);
+  
+  this.close = function(){
+    router.close();
+    event = null;
   }
-
-  this.onWarning = function(callback){
-    event.on(severityEnum.Warning, callback);
-  }
-
-  this.onInfo = function(callback){
-    event.on(severityEnum.Info, callback);
-  }
-
-  this.onVerbose = function(callback){
-    event.on(severityEnum.Verbose, callback);
-  }
-
-  //#endregion
 
   this.defineCategory = function(name){
     categories[name] = name;
@@ -129,7 +108,28 @@ module.exports = function Logger(onLoadError, onReady, configPath = './logger.js
 
   //#endregion
 
-  this.close = function(){
-    router.close();
+  //#region register custom event handlers
+
+  this.onLog = function(callback){
+    event.on('any', callback);
   }
+
+  this.onError = function(callback){
+    event.on(severityEnum.Error, callback);
+  }
+
+  this.onWarning = function(callback){
+    event.on(severityEnum.Warning, callback);
+  }
+
+  this.onInfo = function(callback){
+    event.on(severityEnum.Info, callback);
+  }
+
+  this.onVerbose = function(callback){
+    event.on(severityEnum.Verbose, callback);
+  }
+
+  //#endregion
+
 }

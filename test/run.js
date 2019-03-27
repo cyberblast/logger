@@ -33,7 +33,7 @@ try{
   let count = 0;
   async function cycle(){
     do{  
-      await sleep(200);
+      await sleep(500);
       logger.logWarning(`Cycle ${count++}`, logger.category.cat1);
     }while(count<3);
     logger.close();
@@ -51,18 +51,16 @@ try{
     cycle().catch(onError);
   }
 
-  logger = new Logger(
-    onError,
-    logRdy => {
-      logRdy.onLog(log =>{
-        console.log(JSON.stringify(log));
-      });
-      logRdy.defineCategory('Test');
-      test();
-    },
-    './test/logger.json'
-  );
-
+  async function run(){
+    logger = new Logger('./test/logger.json');
+    await logger.init();
+    logger.defineCategory('Test');
+    logger.onLog(log => {
+      console.log(JSON.stringify(log));
+    });
+    test();
+  }
+  run();
 }
 catch(e){
   onError(e);

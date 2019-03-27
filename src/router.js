@@ -31,13 +31,13 @@ module.exports = class Router{
     return ruleName.replace(/ /g, '') + '.log';
   }
 
-  toFileLogString(data){
+  toFileLogString(logEvent){
     // fixed length for severity (more readable)
     const severity = Buffer.alloc(8, ' ', 'utf8');
-    severity.write(data.severity, 0, 'utf8');
-    let message = `${data.time.format('Y.m.d H:i:s\'v ')}${severity.toString()}${data.category}: ${data.message}`;
-    if(data.data !== undefined && data.data.length){
-      data.data.forEach(d => {
+    severity.write(logEvent.severity, 0, 'utf8');
+    let message = `${logEvent.time.format('Y.m.d H:i:s\'v ')}${severity.toString()}${logEvent.category}: ${logEvent.message}`;
+    if(logEvent.data !== undefined && logEvent.data.length){
+      logEvent.data.forEach(d => {
         if(d != null){
           try{
             // may fail. ignore. for the sake of performance.
@@ -50,12 +50,12 @@ module.exports = class Router{
     return message;
   }
 
-  processLog(data){
+  processLog(logEvent){
     try{
       // filter matching rules
       const match = rule => (
-        (rule.severity === undefined || rule.severity === data.severity)
-        && (rule.category === undefined || rule.category === data.category)
+        (rule.severity === undefined || rule.severity === logEvent.severity)
+        && (rule.category === undefined || rule.category === logEvent.category)
       );
       const matches = this.rules.filter(match);
       // write logfile for each rule
@@ -63,14 +63,14 @@ module.exports = class Router{
       const process = rule => {
         if(rule.console) writeHost = true;
         // compile file format only once. and only if required.
-        if(data.fileLogString === undefined) data.fileLogString = this.toFileLogString(data);
-        if(rule.logfile !== undefined) this.writeLogfile(rule, data);
+        if(logEvent.fileLogString === undefined) logEvent.fileLogString = this.toFileLogString(logEvent);
+        if(rule.logfile !== undefined) this.writeLogfile(rule, logEvent);
       }
       matches.forEach(process);
       // write console only once
       if(writeHost) {
-        if(data.fileLogString === undefined) data.fileLogString = this.toFileLogString(data);
-        this.writeHost(data);
+        if(logEvent.fileLogString === undefined) logEvent.fileLogString = this.toFileLogString(logEvent);
+        this.writeHost(logEvent);
       }
     }catch(e){
       this.close();
@@ -84,18 +84,18 @@ module.exports = class Router{
     this.logFiles[fileName] = new LogFile(path.join(filePath, fileName));
   }
 
-  writeLogfile(rule, data){
+  writeLogfile(rule, logEvent){
     const logfile = this.logFiles[rule.logfile];
     if(logfile === undefined) return;
-    logfile.writeLine(data.fileLogString);
+    logfile.writeLine(logEvent.fileLogString);
   }
-  writeHost(data){
+  writeHost(logEvent){
     let log;
-    if(data.severity === 'Error') log = console.error;
-    else if(data.severity === 'Warning') log = console.warn;
-    else if(data.severity === 'Info')log = console.info;
+    if(logEvent.severity === 'Error') log = console.error;
+    else if(logEvent.severity === 'Warning') log = console.warn;
+    else if(logEvent.severity === 'Info')log = console.info;
     else log = console.log;
-    log(data.fileLogString);
+    log(logEvent.fileLogString);
   }
   close(){
     for(let logfileName in this.logFiles){
