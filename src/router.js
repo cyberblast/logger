@@ -1,6 +1,7 @@
 const LogFile = require('./logfile');
 const path = require('path');
 const severityEnum = require('./severityEnum');
+const severityLevelEnum = require('./severityLevelEnum');
 require('../lib/jacwright.date.format/date.format');
 
 module.exports = class Router{
@@ -8,24 +9,35 @@ module.exports = class Router{
     if(config.rules === undefined || config.rules.length === 0) 
       return;
 
-    const self = this;
     this.event = event;
     this.rules = config.rules;
     this.chatty = config.chatty === true;
     this.logFiles = {};
-    event.on('any', data => {
+  }
+
+  async init(){
+    const self = this;
+    this.event.on('any', async data => {
       self.processLog(data);
     });
     // create LogFile Streams for each rule (with defined path)
-    const parseRule = rule => {
-      if(rule.filePath !== undefined){
-        // TODO: introduce log retention => add timestamp to logname
-        // TODO: handle log retention shift => new file
-        rule.logfile = this.filename(rule.name);
-        this.openStream(rule.filePath, rule.logfile);
-      }
-    };
-    this.rules.forEach(parseRule);
+    await this.asyncForEach(this.rules, this.parseRule, this);
+  }
+
+  async parseRule(rule){
+    if(rule.filePath !== undefined){
+      // TODO: introduce log retention => add timestamp to logname
+      // TODO: handle log retention shift => new file
+      rule.logfile = this.filename(rule.name);
+      await this.openStream(rule.filePath, rule.logfile);
+    }
+  }
+
+  async asyncForEach(array, callback, scope) {
+    if(scope) callback = callback.bind(scope);
+    for (let index = 0; index < array.length; index++) {
+      await callback(array[index], index, array);
+    }
   }
 
   filename(ruleName){
@@ -51,9 +63,10 @@ module.exports = class Router{
     return message;
   }
 
-  processLog(logEvent){
+  async processLog(logEvent){
     try{
       // filter matching rules
+      // TODO: Allow some kind of > operator for severityLevel
       const match = rule => (
         (rule.severity === undefined || rule.severity === logEvent.severity)
         && (rule.category === undefined || rule.category === logEvent.category)
@@ -61,7 +74,7 @@ module.exports = class Router{
       const matches = this.rules.filter(match);
       // write logfile for each rule
       let writeHost = false;
-      const process = rule => {
+      const process = async rule => {
         if(rule.console) writeHost = true;
         // compile file format only once. and only if required.
         if(logEvent.fileLogString === undefined) logEvent.fileLogString = this.toFileLogString(logEvent);
@@ -83,13 +96,14 @@ module.exports = class Router{
     }
   }
 
-  openStream(filePath, fileName){
+  async openStream(filePath, fileName){
     if(this.logFiles[fileName] !== undefined) 
       return;
     this.logFiles[fileName] = new LogFile(path.join(filePath, fileName));
+    await this.logFiles[fileName].init();
   }
 
-  writeLogfile(rule, logEvent){
+  async writeLogfile(rule, logEvent){
     const logfile = this.logFiles[rule.logfile];
     if(logfile === undefined) return;
     logfile.writeLine(logEvent.fileLogString);
