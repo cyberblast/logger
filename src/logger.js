@@ -1,13 +1,8 @@
 const Event = require('events');
 const config = require('@cyberblast/config');
-const Router = require('./router')
+const Router = require('./router');
+const severityEnum = require('./severityEnum');
 
-const severityEnum = {
-  Error: "Error",
-  Warning: "Warning",
-  Info: "Info",
-  Verbose: "Verbose"
-};
 const severityLevelEnum = {
   Error: 1,
   Warning: 2,
@@ -112,6 +107,10 @@ module.exports = function Logger(configPath = './logger.json'){
 
   this.onLog = function(callback){
     event.on('any', callback);
+  }
+
+  this.on = function(eventName, callback){
+    event.on(eventName, callback);
   }
 
   this.onError = function(callback){

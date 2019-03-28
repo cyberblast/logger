@@ -1,6 +1,6 @@
 const LogFile = require('./logfile');
 const path = require('path');
-const fs = require('fs');
+const severityEnum = require('./severityEnum');
 require('../lib/jacwright.date.format/date.format');
 
 module.exports = class Router{
@@ -9,6 +9,7 @@ module.exports = class Router{
       return;
 
     const self = this;
+    this.event = event;
     this.rules = config.rules;
     this.chatty = config.chatty === true;
     this.logFiles = {};
@@ -65,6 +66,10 @@ module.exports = class Router{
         // compile file format only once. and only if required.
         if(logEvent.fileLogString === undefined) logEvent.fileLogString = this.toFileLogString(logEvent);
         if(rule.logfile !== undefined) this.writeLogfile(rule, logEvent);
+        // also trigger event named same as rulename if it's not a predefined eventName (prevent double trigger)
+        if(rule.name !== undefined && severityEnum[rule.name] === undefined && rule.name !== 'any'){
+          this.event.emit('rule.name');
+        }
       }
       matches.forEach(process);
       // write console only once

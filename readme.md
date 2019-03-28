@@ -23,6 +23,10 @@ logger.onWarning(log => {
 logger.onLog(log => {
   console.log(`${log.severity}: ${log.message}`);
 });
+// on allows to attach to custom filter rules (defined in config file)
+logger.on('data loss', log => {
+  process.abort();
+});
 // trigger some log events
 logger.logVerbose('logger ready');
 logger.logWarning('Do the Bartman', logger.category.Sample);
