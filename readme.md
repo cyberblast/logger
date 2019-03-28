@@ -14,12 +14,14 @@ const logger = new Logger('./logger.json');
 await logger.init();
 // define categories in config file or create them in code (or both)
 logger.defineCategory('Sample');
-// attach additional log handlers
-logger.onLog(log => {
-  console.log(`${log.severity}: ${log.message}`);
-});
+// register additional custom log handlers
+// attach callbacks to onError, onWarning, onInfo and onVerbose
 logger.onWarning(log => {
   console.warn(`Ooops: ${log.message}. Details: ${JSON.stringify(log.data)}`);
+});
+// onLog catches them all
+logger.onLog(log => {
+  console.log(`${log.severity}: ${log.message}`);
 });
 // trigger some log events
 logger.logVerbose('logger ready');
