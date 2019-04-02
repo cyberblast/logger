@@ -19,17 +19,25 @@ logger.defineCategory('Sample');
 logger.onWarning(log => {
   console.warn(`Ooops: ${log.message}. Details: ${JSON.stringify(log.data)}`);
 });
-// onLog catches them all
+// 'onLog' catches them all
 logger.onLog(log => {
   console.log(`${log.severity}: ${log.message}`);
 });
-// on allows to attach to custom filter rules (defined in config file)
-logger.on('data loss', log => {
-  process.abort();
+// 'on' allows to attach to custom filter rules (defined in config file)
+logger.on('BackendError', log => {
+  // sample function call not part of this repo:
+  sendMailAlert(log);
 });
 // trigger some log events
 logger.logVerbose('logger ready');
 logger.logWarning('Do the Bartman', logger.category.Sample);
+// or more explicit with some sample additional payload
+logger.log({
+  category: logger.category.BackendError,
+  severity: logger.severity.Error,
+  message: 'storage capacity reached!',
+  data: ['Drive C', {usage: '100%'}]
+});
 // close file streams gracefully
 logger.close();
 ```
