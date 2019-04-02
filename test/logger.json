@@ -5,6 +5,7 @@
     {
       "name": "cat1 warnings",
       "severity": "Warning",
+      "severityOnly": true,
       "category": "cat1",
       "filePath": "./test/result/",
       "console": true
