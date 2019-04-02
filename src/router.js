@@ -41,6 +41,7 @@ module.exports = class Router{
   }
 
   filename(ruleName){
+    // TODO: Prevent usage of same filename multiple times
     return ruleName.replace(/ /g, '') + '.log';
   }
 
@@ -66,10 +67,12 @@ module.exports = class Router{
   async processLog(logEvent){
     try{
       // filter matching rules
-      // TODO: Allow some kind of > operator for severityLevel
+      const severityMatch = rule => rule.severity === undefined
+        || (rule.severityOnly === true && rule.severity === logEvent.severity)
+        || severityLevelEnum[logEvent.severity] >= severityLevelEnum[rule.severity];
       const match = rule => (
-        (rule.severity === undefined || rule.severity === logEvent.severity)
-        && (rule.category === undefined || rule.category === logEvent.category)
+        (rule.category === undefined || rule.category === logEvent.category)
+        && severityMatch(rule)
       );
       const matches = this.rules.filter(match);
       // write logfile for each rule
@@ -108,6 +111,7 @@ module.exports = class Router{
     if(logfile === undefined) return;
     logfile.writeLine(logEvent.fileLogString);
   }
+
   writeHost(logEvent){
     let log;
     if(logEvent.severity === 'Error') log = console.error;
@@ -116,6 +120,7 @@ module.exports = class Router{
     else log = console.log;
     log(logEvent.fileLogString);
   }
+
   close(){
     for(let logfileName in this.logFiles){
       const logfile = this.logFiles[logfileName];
