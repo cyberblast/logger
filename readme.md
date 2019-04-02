@@ -8,6 +8,7 @@ A simple logger for node
 ## Usage
 
 ```js
+const Logger = require('@cyberblast/logger');
 // Optional file path argument. Defaults to './logger.json'
 const logger = new Logger('./logger.json');
 // init will create log files and open file streams
