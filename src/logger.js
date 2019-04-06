@@ -1,5 +1,5 @@
 const Event = require('events');
-const config = require('@cyberblast/config');
+const Config = require('@cyberblast/config');
 const Router = require('./router');
 const severityEnum = require('./severityEnum');
 const severityLevelEnum = require('./severityLevelEnum');
@@ -8,6 +8,7 @@ module.exports = function Logger(configPath = './logger.json'){
   const self = this;
   let event;
   let categories;
+  let config;
   let router;
   
   Object.defineProperty(this, 'category', { 
@@ -32,8 +33,10 @@ module.exports = function Logger(configPath = './logger.json'){
     categories = {
       NONE: "NONE"
     };
-    const settings = await config.load(configPath);
-    settings.categories.forEach(self.defineCategory);
+
+    config = new Config(configPath);
+    const settings = await config.load();
+    if(settings.categories !== undefined) settings.categories.forEach(self.defineCategory);
     event = new Event();
     router = new Router(settings, event);
     await router.init();

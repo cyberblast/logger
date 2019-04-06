@@ -50,16 +50,25 @@ module.exports = class Router{
     const severity = Buffer.alloc(8, ' ', 'utf8');
     severity.write(logEvent.severity, 0, 'utf8');
     let message = `${logEvent.time.format('Y.m.d H:i:s\'v ')}${severity.toString()}${logEvent.category}: ${logEvent.message}`;
-    if(logEvent.data !== undefined && logEvent.data.length){
-      logEvent.data.forEach(d => {
+    if(logEvent.data !== undefined){
+      const addObj = d => {
         if(d != null){
           try{
             // may fail. ignore. for the sake of performance.
-            const dataString = JSON.stringify(d);
-            message = `${message}|${dataString}`;
+            if(d instanceof Error){
+              message = `${message}|${d.trace ? d.trace : d.message}`;
+            } else {
+              const dataString = JSON.stringify(d);
+              message = `${message}|${dataString}`;
+            }
           }catch{}
         }
-      })
+      }
+      if(logEvent.data instanceof Array && logEvent.data.length){
+        logEvent.data.forEach(addObj);
+      } else {
+        addObj(logEvent.data);
+      }
     }
     return message;
   }
