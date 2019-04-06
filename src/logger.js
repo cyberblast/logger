@@ -33,7 +33,7 @@ module.exports = function Logger(configPath = './logger.json'){
       NONE: "NONE"
     };
     const settings = await config.load(configPath);
-    settings.categories.forEach(self.defineCategory);
+    if(settings.categories !== undefined) settings.categories.forEach(self.defineCategory);
     event = new Event();
     router = new Router(settings, event);
     await router.init();
