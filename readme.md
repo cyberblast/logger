@@ -8,7 +8,7 @@ A simple logger for node
 ## Usage
 
 ```js
-const Logger = require('@cyberblast/logger');
+const { Logger, severity } = require('@cyberblast/logger');
 // Optional file path argument. Defaults to './logger.json'
 const logger = new Logger('./logger.json');
 // init will create log files and open file streams
@@ -35,7 +35,7 @@ logger.logWarning('Do the Bartman', logger.category.Sample);
 // or more explicit with some sample additional payload
 logger.log({
   category: logger.category.BackendError,
-  severity: logger.severity.Error,
+  severity: severity.Error,
   message: 'storage capacity reached!',
   data: ['Drive C', {usage: '100%'}]
 });
