@@ -1,7 +1,9 @@
 const LogFile = require('./logfile');
 const path = require('path');
-const severityEnum = require('./severityEnum');
-const severityLevelEnum = require('./severityLevelEnum');
+const {
+  severity,
+  severityLevel
+} = require('./severity');
 require('../lib/jacwright.date.format/date.format');
 
 module.exports = class Router{
@@ -78,7 +80,7 @@ module.exports = class Router{
       // filter matching rules
       const severityMatch = rule => rule.severity === undefined
         || (rule.severityOnly === true && rule.severity === logEvent.severity)
-        || severityLevelEnum[logEvent.severity] >= severityLevelEnum[rule.severity];
+        || severityLevel[logEvent.severity] >= severityLevel[rule.severity];
       const match = rule => (
         (rule.category === undefined || rule.category === logEvent.category)
         && severityMatch(rule)
@@ -92,7 +94,7 @@ module.exports = class Router{
         if(logEvent.fileLogString === undefined) logEvent.fileLogString = this.toFileLogString(logEvent);
         if(rule.logfile !== undefined) this.writeLogfile(rule, logEvent);
         // also trigger event named same as rulename if it's not a predefined eventName (prevent double trigger)
-        if(rule.name !== undefined && severityEnum[rule.name] === undefined && rule.name !== 'any'){
+        if(rule.name !== undefined && severity[rule.name] === undefined && rule.name !== 'any'){
           this.event.emit('rule.name');
         }
       }

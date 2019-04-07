@@ -1,8 +1,10 @@
 const Event = require('events');
 const Config = require('@cyberblast/config');
 const Router = require('./router');
-const severityEnum = require('./severityEnum');
-const severityLevelEnum = require('./severityLevelEnum');
+const {
+  severity,
+  severityLevel
+} = require('./severity');
 
 module.exports = function Logger(configPath = './logger.json'){
   const self = this;
@@ -19,13 +21,13 @@ module.exports = function Logger(configPath = './logger.json'){
 
   Object.defineProperty(this, 'severity', { 
     get: function() { 
-      return severityEnum; 
+      return severity; 
     } 
   });
 
   Object.defineProperty(this, 'severityLevel', { 
     get: function() { 
-      return severityLevelEnum; 
+      return severityLevel; 
     } 
   });
 
@@ -62,7 +64,7 @@ module.exports = function Logger(configPath = './logger.json'){
 
   this.logError = function(message, category = categories.NONE, ...data){
     this.log({
-      severity: severityEnum.Error,
+      severity: severity.Error,
       category,
       message,
       data,
@@ -72,7 +74,7 @@ module.exports = function Logger(configPath = './logger.json'){
 
   this.logWarning = function(message, category = categories.NONE, ...data){
     this.log({
-      severity: severityEnum.Warning,
+      severity: severity.Warning,
       category,
       message,
       data
@@ -81,7 +83,7 @@ module.exports = function Logger(configPath = './logger.json'){
 
   this.logInfo = function(message, category = categories.NONE, ...data){
     this.log({
-      severity: severityEnum.Info,
+      severity: severity.Info,
       category,
       message,
       data,
@@ -91,7 +93,7 @@ module.exports = function Logger(configPath = './logger.json'){
 
   this.logVerbose = function(message, category = categories.NONE, ...data){
     this.log({
-      severity: severityEnum.Verbose,
+      severity: severity.Verbose,
       category,
       message,
       data,
@@ -112,19 +114,19 @@ module.exports = function Logger(configPath = './logger.json'){
   }
 
   this.onError = function(callback){
-    event.on(severityEnum.Error, callback);
+    event.on(severity.Error, callback);
   }
 
   this.onWarning = function(callback){
-    event.on(severityEnum.Warning, callback);
+    event.on(severity.Warning, callback);
   }
 
   this.onInfo = function(callback){
-    event.on(severityEnum.Info, callback);
+    event.on(severity.Info, callback);
   }
 
   this.onVerbose = function(callback){
-    event.on(severityEnum.Verbose, callback);
+    event.on(severity.Verbose, callback);
   }
 
   //#endregion
