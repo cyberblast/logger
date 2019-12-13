@@ -1,4 +1,10 @@
 /node_modules
-/test
 /.vscode
-*.log
+
+/test
+/dist
+
+.travis.yml
+
+.tsconfig.json
+.jsconfig.json
