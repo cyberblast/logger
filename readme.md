@@ -75,14 +75,17 @@ Sample configuration:
 #### Categories
 
 _optional, array of strings_  
-List of predefined log categories. Required to be set before using via category property at Logger class `logger.logWarning('Do the Bartman', logger.category.Sample)`.
+List of predefined log categories. Required to be set before using via category property at Logger class.  
+```js
+logger.logWarning('Do the Bartman', logger.category.Sample);
+```
 
 #### Rules
 
 Rules define what to do with a certain log case. 
 
-* name  
-  _required, string_
+* **name**  
+  _required, string_  
   Every rules needs a unique name. Logfiles will get the name of the rule. You can also hook into log events using the rule name, like: 
   ```js
   logger.on('BackendError', log => {
@@ -109,7 +112,10 @@ Rules define what to do with a certain log case.
   _optional, string_  
   If filePath is set, Logger will create log files at that path. The log file name will have the format `<rule.name>.log`.  
   Must be a valid path string according to Node [Path](https://nodejs.org/api/path.html) module. It must point to a directory. If that directory does not exist, it will be created.  
-  Directory and logfile creation happens immediately upon Logger initialization `await logger.init()`.
+  Directory and logfile creation happens immediately upon Logger initialization.  
+  ```js
+  await logger.init();
+  ```
 
 ## Legal
 
