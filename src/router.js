@@ -102,7 +102,7 @@ class Router {
         if (rule.logfile !== undefined) this.writeLogfile(rule, logEvent);
         // also trigger event named same as rulename if it's not a predefined eventName (prevent double trigger)
         if (rule.name !== undefined && severity[rule.name] === undefined && rule.name !== 'any') {
-          this.event.emit('rule.name');
+          this.event.emit(rule.name, logEvent);
         }
       }
       matches.forEach(process);
