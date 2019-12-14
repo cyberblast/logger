@@ -75,7 +75,7 @@ Sample configuration:
 #### Categories
 
 _optional, array of strings_  
-List of predefined log categories. Required to be set before using via category property at Logger class.  
+List of predefined log categories. Configured categories will be available via category property at Logger class. However, preconfiguring categories is not mandatory to use log categories in logData and rules at all.  
 ```js
 logger.logWarning('Do the Bartman', logger.category.Sample);
 ```
@@ -120,3 +120,7 @@ Rules define what to do with a certain log case.
 ## Legal
 
 Please take note of files [LICENSE](https://raw.githubusercontent.com/cyberblast/logger/master/LICENSE) and [CONTRIBUTING](https://raw.githubusercontent.com/cyberblast/logger/master/CONTRIBUTING).
+
+## Credits
+
+Thanks to Jacob Wright <jacwright@gmail.com> for his [date format library](https://github.com/jacwright/date.format).
