@@ -1,15 +1,18 @@
 {
   "chatty": true,
-  "categories": ["cat1", "cat2"],
+  "categories": [
+    "cat1",
+    "cat2"
+  ],
   "rules": [
     {
-      "name": "cat1 warnings",
+      "name": "cat1warning",
       "severity": "Warning",
       "severityOnly": true,
       "category": "cat1",
       "filePath": "./test/result/",
       "console": true
-    }, 
+    },
     {
       "name": "error",
       "severity": "Error",

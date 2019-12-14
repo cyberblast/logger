@@ -5,7 +5,9 @@ const {
 
 let logger;
 let logCount = 0;
+let logCat1Count = 0;
 let onLogCount = 0;
+let onLogCat1Count = 0;
 
 function onError(e) {
   console.log('closing logfiles gracefully');
@@ -24,10 +26,10 @@ let count = 0;
 async function cycle() {
   do {
     await sleep(500);
-    logger.logWarning(`Cycle ${count++}`, logger.category.cat1);
+    logger.logWarning(`Cycle ${++count}`, logger.category.cat1);
     logCount++;
+    logCat1Count++;
   } while (count < 3);
-  logger.close();
 }
 
 async function run() {
@@ -38,8 +40,14 @@ async function run() {
     console.log(JSON.stringify(log));
     onLogCount++;
   });
+  logger.on('cat1warning', log => {
+    console.log('cat1warning listener triggered');
+    onLogCat1Count++;
+  });
+
   logger.logWarning('Hello World!', logger.category.Test);
   logCount++;
+
   logger.log({
     category: logger.category.cat1,
     severity: severity.Info,
@@ -51,10 +59,19 @@ async function run() {
   await cycle().catch(onError);
 }
 
+function validate() {
+  console.log('Validation entry - closing logger');
+  logger.close();
+  console.log('Checking Results');
+  if (logCount === null || logCount === 0) throw 'no logs really processed!';
+  else if (logCount !== onLogCount) throw 'onLog not as often triggered as log!';
+  else if (logCat1Count !== onLogCat1Count) {
+    console.error(`logCat1Count: ${logCat1Count}, onLogCat1Count: ${onLogCat1Count}`);
+    throw 'custom listener not as often triggered as logged!';
+  }
+  else console.log('Ok');
+}
+
 run()
-  .then(() => {
-    console.log('Checking Results');
-    if (logCount !== onLogCount) throw 'onLog not as often triggered as log!';
-    else console.log('Ok');
-  })
-  .catch(onError);
+  .then(validate)
+  .catch(e => { throw e; });
