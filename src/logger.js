@@ -2,8 +2,8 @@ const EventEmitter = require('events');
 const Config = require('@cyberblast/config');
 const Router = require('./router');
 const {
-  severity,
-  severityLevel
+  Severity,
+  SeverityLevel
 } = require('./severity');
 
 /**
@@ -91,7 +91,7 @@ function Logger(configPath = './logger.json') {
    */
   this.logError = function(message, category = categories.NONE, ...data) {
     this.log({
-      severity: severity.Error,
+      severity: Severity.Error,
       category,
       message,
       data,
@@ -108,7 +108,7 @@ function Logger(configPath = './logger.json') {
    */
   this.logWarning = function(message, category = categories.NONE, ...data) {
     this.log({
-      severity: severity.Warning,
+      severity: Severity.Warning,
       category,
       message,
       data
@@ -124,7 +124,7 @@ function Logger(configPath = './logger.json') {
    */
   this.logInfo = function(message, category = categories.NONE, ...data) {
     this.log({
-      severity: severity.Info,
+      severity: Severity.Info,
       category,
       message,
       data,
@@ -141,7 +141,7 @@ function Logger(configPath = './logger.json') {
    */
   this.logVerbose = function(message, category = categories.NONE, ...data) {
     this.log({
-      severity: severity.Verbose,
+      severity: Severity.Verbose,
       category,
       message,
       data,
@@ -175,7 +175,7 @@ function Logger(configPath = './logger.json') {
    * @param {function(LogData): void} callback
    */
   this.onError = function(callback) {
-    emitter.on(severity.Error, callback);
+    emitter.on(Severity.Error, callback);
   }
 
   /**
@@ -183,7 +183,7 @@ function Logger(configPath = './logger.json') {
    * @param {function(LogData): void} callback
    */
   this.onWarning = function(callback) {
-    emitter.on(severity.Warning, callback);
+    emitter.on(Severity.Warning, callback);
   }
 
   /**
@@ -191,7 +191,7 @@ function Logger(configPath = './logger.json') {
    * @param {function(LogData): void} callback
    */
   this.onInfo = function(callback) {
-    emitter.on(severity.Info, callback);
+    emitter.on(Severity.Info, callback);
   }
 
   /**
@@ -199,7 +199,7 @@ function Logger(configPath = './logger.json') {
    * @param {function(LogData): void} callback
    */
   this.onVerbose = function(callback) {
-    emitter.on(severity.Verbose, callback);
+    emitter.on(Severity.Verbose, callback);
   }
 
   //#endregion
@@ -207,6 +207,6 @@ function Logger(configPath = './logger.json') {
 
 module.exports = {
   Logger,
-  severity,
-  severityLevel
+  Severity,
+  SeverityLevel
 }

@@ -1,8 +1,8 @@
 const LogFile = require('./logfile');
 const path = require('path');
 const {
-  severity,
-  severityLevel
+  Severity,
+  SeverityLevel
 } = require('./severity');
 // @ts-ignore
 require('../lib/jacwright.date.format/date.format');
@@ -20,11 +20,11 @@ class Router {
 
   async init() {
     const self = this;
+    // create LogFile Streams for each rule (with defined path)
+    await this.asyncForEach(this.rules, this.parseRule, this);
     this.emitter.on('any', async data => {
       self.processLog(data);
     });
-    // create LogFile Streams for each rule (with defined path)
-    await this.asyncForEach(this.rules, this.parseRule, this);
   }
 
   async parseRule(rule) {
@@ -87,7 +87,7 @@ class Router {
       // filter matching rules
       const severityMatch = rule => rule.severity === undefined
         || (rule.severityOnly === true && rule.severity === logData.severity)
-        || severityLevel[logData.severity] >= severityLevel[rule.severity];
+        || SeverityLevel[logData.severity] >= SeverityLevel[rule.severity];
       const match = rule => (
         (rule.category === undefined || rule.category === logData.category)
         && severityMatch(rule)
@@ -101,7 +101,7 @@ class Router {
         if (logData.fileLogString === undefined) logData.fileLogString = this.toFileLogString(logData);
         if (rule.logfile !== undefined) this.writeLogfile(rule, logData);
         // also trigger event named same as rulename if it's not a predefined eventName (prevent double trigger)
-        if (rule.name !== undefined && severity[rule.name] === undefined && rule.name !== 'any') {
+        if (rule.name !== undefined && Severity[rule.name] === undefined && rule.name !== 'any') {
           this.emitter.emit(rule.name, logData);
         }
       }
@@ -132,9 +132,9 @@ class Router {
 
   writeHost(logData) {
     let log;
-    if (logData.severity === severity.Error) log = console.error;
-    else if (logData.severity === severity.Warning) log = console.warn;
-    else if (logData.severity === severity.Info) log = console.info;
+    if (logData.severity === Severity.Error) log = console.error;
+    else if (logData.severity === Severity.Warning) log = console.warn;
+    else if (logData.severity === Severity.Info) log = console.info;
     else log = console.log;
     log(logData.fileLogString);
   }

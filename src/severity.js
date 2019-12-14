@@ -1,13 +1,13 @@
 module.exports = {
   /** @enum {string} */
-  severity: {
+  Severity: {
     Error: "Error",
     Warning: "Warning",
     Info: "Info",
     Verbose: "Verbose"
   },
   /** @enum {number} */
-  severityLevel: {
+  SeverityLevel: {
     Error: 4,
     Warning: 3,
     Info: 2,

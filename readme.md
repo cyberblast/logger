@@ -92,14 +92,20 @@ Rules define what to do with a certain log case.
     sendMailAlert(log);
   });
   ```
-  Where 'BackendError' would be the name of the rule
+  Where 'BackendError' would be the name of the rule. This only works only for rules with names not matching the reserved word "any" or a severity name.
 * **category**  
   _optional, string_  
   Log cases can have categories. If you specify a rule category, that rule will only be executed when rule category and log category match.
 * **severity**  
   _optional, string_  
   Log cases can have a severity. If you specify a rule severity, that rule will only be executed, if rule severity and log severity match or the log severity is higer.  Also depends on 'severityOnly' rule property.  
-  If you don't specify a severity, that rule will run for all severities.
+  If you don't specify a rule severity, that rule will run for all severities.  
+  You can also hook into log events using the severity name, like: 
+  ```js
+  logger.on('Warning', log => {
+    sendMailAlert(log);
+  });
+  ```
 * **severityOnly**  
   _optional, boolean_  
   Defaults to `false`.  
