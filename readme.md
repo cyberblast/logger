@@ -129,4 +129,4 @@ Please take note of files [LICENSE](https://raw.githubusercontent.com/cyberblast
 
 ## Credits
 
-Thanks to Jacob Wright \<jacwright@gmail.com\> for his [date format library](https://github.com/jacwright/date.format).
+Thanks to Jacob Wright for his [date format library](https://github.com/jacwright/date.format).
