@@ -4,6 +4,7 @@
 /test
 /dist
 
+.gitignore
 .travis.yml
 
 .tsconfig.json

@@ -1,14 +1,14 @@
-const Event = require('events');
+const EventEmitter = require('events');
 const Config = require('@cyberblast/config');
 const Router = require('./router');
 const {
-  severity,
-  severityLevel
+  Severity,
+  SeverityLevel
 } = require('./severity');
 
 /**
  * @typedef {Object} LogData - Log event data
- * @property {string} severity
+ * @property {Severity} severity
  * @property {string} category
  * @property {string} message
  * @property {any} [data]
@@ -16,14 +16,13 @@ const {
  */
 
 /**
+ * Logger Class
  * @class
- * @param {string=} configPath
+ * @param {string=} configPath - Path to config file. Defaults to './logger.json'.
  */
 function Logger(configPath = './logger.json') {
-  /** @type {Logger} */
-  const self = this;
-  /** @type {Event} */
-  let event;
+  /** @type {EventEmitter} */
+  let emitter;
   /** @enum {string} */
   let categories;
   /** @type {Config} */
@@ -31,13 +30,13 @@ function Logger(configPath = './logger.json') {
   /** @type {Router} */
   let router;
 
-  // Workaround to define Property type in vscode
   /** @enum {string} */
   this.category = undefined;
   Object.defineProperty(this, 'category', {
     get: function() {
       return categories;
-    }
+    },
+    enumerable: true
   });
 
   /**
@@ -51,16 +50,16 @@ function Logger(configPath = './logger.json') {
 
     config = new Config(configPath);
     const settings = await config.load();
-    if (settings.categories !== undefined) settings.categories.forEach(self.defineCategory);
-    event = new Event();
-    router = new Router(settings, event);
+    if (settings.categories !== undefined) settings.categories.forEach(this.defineCategory);
+    emitter = new EventEmitter();
+    router = new Router(settings, emitter);
     await router.init();
   }
 
   /** Close streams */
   this.close = function() {
     router.close();
-    event = null;
+    emitter = null;
   }
 
   /**
@@ -73,12 +72,12 @@ function Logger(configPath = './logger.json') {
 
   /**
    * Create a log entry
-   * @param {LogData} logDetails - Log event data
+   * @param {LogData} logData - Log event data
    */
-  this.log = function(logDetails) {
-    if (logDetails.time === undefined) logDetails.time = new Date();
-    event.emit('any', logDetails);
-    event.emit(logDetails.severity, logDetails);
+  this.log = function(logData) {
+    if (logData.time === undefined) logData.time = new Date();
+    emitter.emit('any', logData);
+    emitter.emit(logData.severity, logData);
   }
 
   //#region shortcuts
@@ -92,7 +91,7 @@ function Logger(configPath = './logger.json') {
    */
   this.logError = function(message, category = categories.NONE, ...data) {
     this.log({
-      severity: severity.Error,
+      severity: Severity.Error,
       category,
       message,
       data,
@@ -109,10 +108,11 @@ function Logger(configPath = './logger.json') {
    */
   this.logWarning = function(message, category = categories.NONE, ...data) {
     this.log({
-      severity: severity.Warning,
+      severity: Severity.Warning,
       category,
       message,
-      data
+      data,
+      time: new Date()
     });
   }
 
@@ -125,7 +125,7 @@ function Logger(configPath = './logger.json') {
    */
   this.logInfo = function(message, category = categories.NONE, ...data) {
     this.log({
-      severity: severity.Info,
+      severity: Severity.Info,
       category,
       message,
       data,
@@ -142,7 +142,7 @@ function Logger(configPath = './logger.json') {
    */
   this.logVerbose = function(message, category = categories.NONE, ...data) {
     this.log({
-      severity: severity.Verbose,
+      severity: Severity.Verbose,
       category,
       message,
       data,
@@ -159,16 +159,16 @@ function Logger(configPath = './logger.json') {
    * @param {function(LogData): void} callback
    */
   this.onLog = function(callback) {
-    event.on('any', callback);
+    emitter.on('any', callback);
   }
 
   /**
    * Attach to specific logging events
-   * @param {string} eventName - rule name
+   * @param {string} ruleName - rule name
    * @param {function(LogData): void} callback
    */
-  this.on = function(eventName, callback) {
-    event.on(eventName, callback);
+  this.on = function(ruleName, callback) {
+    emitter.on(ruleName, callback);
   }
 
   /**
@@ -176,7 +176,7 @@ function Logger(configPath = './logger.json') {
    * @param {function(LogData): void} callback
    */
   this.onError = function(callback) {
-    event.on(severity.Error, callback);
+    emitter.on(Severity.Error, callback);
   }
 
   /**
@@ -184,7 +184,7 @@ function Logger(configPath = './logger.json') {
    * @param {function(LogData): void} callback
    */
   this.onWarning = function(callback) {
-    event.on(severity.Warning, callback);
+    emitter.on(Severity.Warning, callback);
   }
 
   /**
@@ -192,7 +192,7 @@ function Logger(configPath = './logger.json') {
    * @param {function(LogData): void} callback
    */
   this.onInfo = function(callback) {
-    event.on(severity.Info, callback);
+    emitter.on(Severity.Info, callback);
   }
 
   /**
@@ -200,7 +200,7 @@ function Logger(configPath = './logger.json') {
    * @param {function(LogData): void} callback
    */
   this.onVerbose = function(callback) {
-    event.on(severity.Verbose, callback);
+    emitter.on(Severity.Verbose, callback);
   }
 
   //#endregion
@@ -208,6 +208,6 @@ function Logger(configPath = './logger.json') {
 
 module.exports = {
   Logger,
-  severity,
-  severityLevel
+  Severity,
+  SeverityLevel
 }

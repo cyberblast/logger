@@ -75,28 +75,37 @@ Sample configuration:
 #### Categories
 
 _optional, array of strings_  
-List of predefined log categories. Required to be set before using via category property at Logger class `logger.logWarning('Do the Bartman', logger.category.Sample)`.
+List of predefined log categories. Configured categories will be available via category property at Logger class. However, preconfiguring categories is not mandatory to use log categories in logData and rules at all.  
+```js
+logger.logWarning('Do the Bartman', logger.category.Sample);
+```
 
 #### Rules
 
 Rules define what to do with a certain log case. 
 
-* name  
-  _required, string_
+* **name**  
+  _required, string_  
   Every rules needs a unique name. Logfiles will get the name of the rule. You can also hook into log events using the rule name, like: 
   ```js
   logger.on('BackendError', log => {
     sendMailAlert(log);
   });
   ```
-  Where 'BackendError' would be the name of the rule
+  Where 'BackendError' would be the name of the rule. This only works only for rules with names not matching the reserved word "any" or a severity name.
 * **category**  
   _optional, string_  
   Log cases can have categories. If you specify a rule category, that rule will only be executed when rule category and log category match.
 * **severity**  
   _optional, string_  
   Log cases can have a severity. If you specify a rule severity, that rule will only be executed, if rule severity and log severity match or the log severity is higer.  Also depends on 'severityOnly' rule property.  
-  If you don't specify a severity, that rule will run for all severities.
+  If you don't specify a rule severity, that rule will run for all severities.  
+  You can also hook into log events using the severity name, like: 
+  ```js
+  logger.on('Warning', log => {
+    sendMailAlert(log);
+  });
+  ```
 * **severityOnly**  
   _optional, boolean_  
   Defaults to `false`.  
@@ -109,8 +118,15 @@ Rules define what to do with a certain log case.
   _optional, string_  
   If filePath is set, Logger will create log files at that path. The log file name will have the format `<rule.name>.log`.  
   Must be a valid path string according to Node [Path](https://nodejs.org/api/path.html) module. It must point to a directory. If that directory does not exist, it will be created.  
-  Directory and logfile creation happens immediately upon Logger initialization `await logger.init()`.
+  Directory and logfile creation happens immediately upon Logger initialization.  
+  ```js
+  await logger.init();
+  ```
 
 ## Legal
 
 Please take note of files [LICENSE](https://raw.githubusercontent.com/cyberblast/logger/master/LICENSE) and [CONTRIBUTING](https://raw.githubusercontent.com/cyberblast/logger/master/CONTRIBUTING).
+
+## Credits
+
+Thanks to Jacob Wright for his [date format library](https://github.com/jacwright/date.format).

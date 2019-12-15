@@ -73,7 +73,7 @@ function LogFile(filePath) {
 
   // close file stream
   this.close = function() {
-    if (stream.writable) stream.close();
+    if (stream != null && stream.writable) stream.close();
     stream = null;
   }
 }

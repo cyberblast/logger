@@ -1,18 +1,18 @@
 const LogFile = require('./logfile');
 const path = require('path');
 const {
-  severity,
-  severityLevel
+  Severity,
+  SeverityLevel
 } = require('./severity');
 // @ts-ignore
 require('../lib/jacwright.date.format/date.format');
 
 class Router {
-  constructor(config, event) {
+  constructor(config, emitter) {
     if (config.rules === undefined || config.rules.length === 0)
       return;
 
-    this.event = event;
+    this.emitter = emitter;
     this.rules = config.rules;
     this.chatty = config.chatty === true;
     this.logFiles = {};
@@ -20,11 +20,11 @@ class Router {
 
   async init() {
     const self = this;
-    this.event.on('any', async data => {
-      self.processLog(data);
-    });
     // create LogFile Streams for each rule (with defined path)
     await this.asyncForEach(this.rules, this.parseRule, this);
+    this.emitter.on('any', async data => {
+      self.processLog(data);
+    });
   }
 
   async parseRule(rule) {
@@ -48,12 +48,12 @@ class Router {
     return ruleName.replace(/ /g, '') + '.log';
   }
 
-  toFileLogString(logEvent) {
+  toFileLogString(logData) {
     // fixed length for severity (more readable)
     const severity = Buffer.alloc(8, ' ', 'utf8');
-    severity.write(logEvent.severity, 0, 'utf8');
-    let message = `${logEvent.time.format('Y.m.d H:i:s\'v ')}${severity.toString()}${logEvent.category}: ${logEvent.message}`;
-    if (logEvent.data !== undefined) {
+    severity.write(logData.severity, 0, 'utf8');
+    let message = `${logData.time.format('Y.m.d H:i:s\'v ')}${severity.toString()}${logData.category}: ${logData.message}`;
+    if (logData.data !== undefined) {
       const addObj = d => {
         if (d != null) {
           try {
@@ -73,23 +73,23 @@ class Router {
           } catch{ }
         }
       }
-      if (logEvent.data instanceof Array) {
-        if (logEvent.data.length !== 0) logEvent.data.forEach(addObj);
+      if (logData.data instanceof Array) {
+        if (logData.data.length !== 0) logData.data.forEach(addObj);
       } else {
-        addObj(logEvent.data);
+        addObj(logData.data);
       }
     }
     return message;
   }
 
-  async processLog(logEvent) {
+  async processLog(logData) {
     try {
       // filter matching rules
       const severityMatch = rule => rule.severity === undefined
-        || (rule.severityOnly === true && rule.severity === logEvent.severity)
-        || severityLevel[logEvent.severity] >= severityLevel[rule.severity];
+        || (rule.severityOnly === true && rule.severity === logData.severity)
+        || SeverityLevel[logData.severity] >= SeverityLevel[rule.severity];
       const match = rule => (
-        (rule.category === undefined || rule.category === logEvent.category)
+        (rule.category === undefined || rule.category === logData.category)
         && severityMatch(rule)
       );
       const matches = this.rules.filter(match);
@@ -98,18 +98,18 @@ class Router {
       const process = async rule => {
         if (rule.console) writeHost = true;
         // compile file format only once. and only if required.
-        if (logEvent.fileLogString === undefined) logEvent.fileLogString = this.toFileLogString(logEvent);
-        if (rule.logfile !== undefined) this.writeLogfile(rule, logEvent);
+        if (logData.fileLogString === undefined) logData.fileLogString = this.toFileLogString(logData);
+        if (rule.logfile !== undefined) this.writeLogfile(rule, logData);
         // also trigger event named same as rulename if it's not a predefined eventName (prevent double trigger)
-        if (rule.name !== undefined && severity[rule.name] === undefined && rule.name !== 'any') {
-          this.event.emit(rule.name, logEvent);
+        if (rule.name !== undefined && Severity[rule.name] === undefined && rule.name !== 'any') {
+          this.emitter.emit(rule.name, logData);
         }
       }
       matches.forEach(process);
       // write console only once
       if (writeHost) {
-        if (logEvent.fileLogString === undefined) logEvent.fileLogString = this.toFileLogString(logEvent);
-        this.writeHost(logEvent);
+        if (logData.fileLogString === undefined) logData.fileLogString = this.toFileLogString(logData);
+        this.writeHost(logData);
       }
     } catch (e) {
       this.close();
@@ -124,19 +124,19 @@ class Router {
     await this.logFiles[fileName].init();
   }
 
-  async writeLogfile(rule, logEvent) {
+  async writeLogfile(rule, logData) {
     const logfile = this.logFiles[rule.logfile];
     if (logfile === undefined) return;
-    logfile.writeLine(logEvent.fileLogString);
+    logfile.writeLine(logData.fileLogString);
   }
 
-  writeHost(logEvent) {
+  writeHost(logData) {
     let log;
-    if (logEvent.severity === 'Error') log = console.error;
-    else if (logEvent.severity === 'Warning') log = console.warn;
-    else if (logEvent.severity === 'Info') log = console.info;
+    if (logData.severity === Severity.Error) log = console.error;
+    else if (logData.severity === Severity.Warning) log = console.warn;
+    else if (logData.severity === Severity.Info) log = console.info;
     else log = console.log;
-    log(logEvent.fileLogString);
+    log(logData.fileLogString);
   }
 
   close() {

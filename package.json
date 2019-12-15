@@ -1,6 +1,6 @@
 {
   "name": "@cyberblast/logger",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "A simple logger for node",
   "author": "cyberblast <git@cyberblast.org>",
   "license": "MIT",
@@ -31,8 +31,6 @@
     "node": "*"
   },
   "dependencies": {
-    "@cyberblast/config": "0.0.8"
-  },
-  "devDependencies": {},
-  "optionalDependencies": {}
+    "@cyberblast/config": "0.0.9"
+  }
 }
