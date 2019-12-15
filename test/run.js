@@ -1,6 +1,6 @@
 const {
   Logger,
-  severity
+  Severity
 } = require('../src/logger.js');
 
 let logger;
@@ -50,7 +50,7 @@ async function run() {
 
   logger.log({
     category: logger.category.cat1,
-    severity: severity.Info,
+    severity: Severity.Info,
     message: 'Into the sun',
     data: ['yadda', { some: 'thing' }]
   });

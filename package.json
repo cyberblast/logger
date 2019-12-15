@@ -31,8 +31,6 @@
     "node": "*"
   },
   "dependencies": {
-    "@cyberblast/config": "0.0.8"
-  },
-  "devDependencies": {},
-  "optionalDependencies": {}
+    "@cyberblast/config": "0.0.9"
+  }
 }
