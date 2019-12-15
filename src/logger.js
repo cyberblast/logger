@@ -8,7 +8,7 @@ const {
 
 /**
  * @typedef {Object} LogData - Log event data
- * @property {string} severity
+ * @property {Severity} severity
  * @property {string} category
  * @property {string} message
  * @property {any} [data]
@@ -111,7 +111,8 @@ function Logger(configPath = './logger.json') {
       severity: Severity.Warning,
       category,
       message,
-      data
+      data,
+      time: new Date()
     });
   }
 

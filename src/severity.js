@@ -1,12 +1,18 @@
 module.exports = {
-  /** @enum {string} */
+  /**
+   * @readonly 
+   * @enum {string} 
+   * */
   Severity: {
     Error: "Error",
     Warning: "Warning",
     Info: "Info",
     Verbose: "Verbose"
   },
-  /** @enum {number} */
+  /**
+   * @readonly 
+   * @enum {number} 
+   * */
   SeverityLevel: {
     Error: 4,
     Warning: 3,
