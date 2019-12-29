@@ -4,6 +4,7 @@ A simple logger for node
 
 [![Build Status](https://travis-ci.com/cyberblast/logger.svg?branch=dev)](https://travis-ci.com/cyberblast/logger)
 [![npm version](https://badge.fury.io/js/%40cyberblast%2Flogger.svg)](https://badge.fury.io/js/%40cyberblast%2Flogger)
+[![TypeScript definitions on DefinitelyTyped](https://definitelytyped.org/badges/standard-flat.svg)](https://www.npmjs.com/package/@types/cyberblast__logger)
 
 ## Usage
 
